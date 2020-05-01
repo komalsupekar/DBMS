@@ -1,0 +1,149 @@
+
+
+[student@localhost ~]$ su
+Password: 
+[root@localhost student]# systemctl start mongod
+[root@localhost student]# mongo
+MongoDB shell version: 2.4.6
+connecting to: test
+> show dbs
+Demo	0.203125GB
+Jolly	0.203125GB
+admin	(empty)
+local	0.078125GB
+sshift	0.203125GB
+> use rajat
+switched to db rajat
+> db.createCollection("Student");
+{ "ok" : 1 }
+> db.Student.insert
+function ( obj , options, _allow_dot ){
+    if ( ! obj )
+        throw "no object passed to insert!";
+    if ( ! _allow_dot ) {
+        this._validateForStorage( obj );
+    }
+
+    if ( typeof( options ) == "undefined" ) options = 0;
+
+    if ( typeof( obj._id ) == "undefined" && ! Array.isArray( obj ) ){
+        var tmp = obj; // don't want to modify input
+        obj = {_id: new ObjectId()};
+        for (var key in tmp){
+            obj[key] = tmp[key];
+        }
+    }
+    var startTime = (typeof(_verboseShell) === 'undefined' ||
+                     !_verboseShell) ? 0 : new Date().getTime();
+    this._mongo.insert( this._fullName , obj, options );
+    this._lastID = obj._id;
+    this._printExtraInfo("Inserted", startTime);
+}
+> db.Student.insert({"sid":1,"name":"Radha","marks":75,"dept":"COMP"})
+> db.Student.insert({"sid":2,"name":"Soleha","marks":85,"dept":"COMP"})
+> db.Student.insert({"sid":3,"name":"Kalyani","marks":65,"dept":"IT"})
+> db.Student.insert({"sid":4,"name":"Vaishnavi","marks"55,"dept":"MECH"})
+Mon Sep 30 12:06:14.073 SyntaxError: Unexpected number
+> db.Student.insert({"sid":4,"name":"Vaishnavi","marks"55","dept":"MECH"})
+... 
+... 
+> db.Student.insert({"sid":4,"name":"Vaishnavi","marks":55,"dept":"MECH"})
+> db.Student.find().pretty();
+{
+	"_id" : ObjectId("5d91a0ff675a60950731fe85"),
+	"sid" : 1,
+	"name" : "Radha",
+	"marks" : 75,
+	"dept" : "COMP"
+}
+{
+	"_id" : ObjectId("5d91a1f5675a60950731fe86"),
+	"sid" : 2,
+	"name" : "Soleha",
+	"marks" : 85,
+	"dept" : "COMP"
+}
+{
+	"_id" : ObjectId("5d91a224675a60950731fe87"),
+	"sid" : 3,
+	"name" : "Kalyani",
+	"marks" : 65,
+	"dept" : "IT"
+}
+{
+	"_id" : ObjectId("5d91a292675a60950731fe88"),
+	"sid" : 4,
+	"name" : "Vaishnavi",
+	"marks" : 55,
+	"dept" : "MECH"
+}
+> db.Student.find{"marks":{$gte:70}})
+Mon Sep 30 12:08:32.335 SyntaxError: Unexpected token {
+> db.Student.find{"marks":{$gte:75}})
+Mon Sep 30 12:08:39.615 SyntaxError: Unexpected token {
+> db.Student.find({"marks":{$gte:75}})
+{ "_id" : ObjectId("5d91a0ff675a60950731fe85"), "sid" : 1, "name" : "Radha", "marks" : 75, "dept" : "COMP" }
+{ "_id" : ObjectId("5d91a1f5675a60950731fe86"), "sid" : 2, "name" : "Soleha", "marks" : 85, "dept" : "COMP" }
+> db.Student.find({"marks":{$gte:70}})
+{ "_id" : ObjectId("5d91a0ff675a60950731fe85"), "sid" : 1, "name" : "Radha", "marks" : 75, "dept" : "COMP" }
+{ "_id" : ObjectId("5d91a1f5675a60950731fe86"), "sid" : 2, "name" : "Soleha", "marks" : 85, "dept" : "COMP" }
+> db.Student.find({"marks":{$lt:60}})
+{ "_id" : ObjectId("5d91a292675a60950731fe88"), "sid" : 4, "name" : "Vaishnavi", "marks" : 55, "dept" : "MECH" }
+> db.Student.update({"name":"soleha"},{$set;{"marks":95}})
+Mon Sep 30 12:16:59.061 SyntaxError: Unexpected token ;
+> db.Student.update({"name":"saniya"},{$set;{"marks":95}})
+Mon Sep 30 12:17:45.069 SyntaxError: Unexpected token ;
+> db.Student.update({"name":"saniya"},{$set:{"marks":95}})
+> db.Student.find().pretty();
+{
+	"_id" : ObjectId("5d91a0ff675a60950731fe85"),
+	"sid" : 1,
+	"name" : "Radha",
+	"marks" : 75,
+	"dept" : "COMP"
+}
+{
+	"_id" : ObjectId("5d91a1f5675a60950731fe86"),
+	"sid" : 2,
+	"name" : "Soleha",
+	"marks" : 85,
+	"dept" : "COMP"
+}
+{
+	"_id" : ObjectId("5d91a224675a60950731fe87"),
+	"sid" : 3,
+	"name" : "Kalyani",
+	"marks" : 65,
+	"dept" : "IT"
+}
+{
+	"_id" : ObjectId("5d91a292675a60950731fe88"),
+	"sid" : 4,
+	"name" : "Vaishnavi",
+	"marks" : 55,
+	"dept" : "MECH"
+}
+> db.Student.remove({"sid":1});
+> db.Student.find().pretty();
+{
+	"_id" : ObjectId("5d91a1f5675a60950731fe86"),
+	"sid" : 2,
+	"name" : "Soleha",
+	"marks" : 85,
+	"dept" : "COMP"
+}
+{
+	"_id" : ObjectId("5d91a224675a60950731fe87"),
+	"sid" : 3,
+	"name" : "Kalyani",
+	"marks" : 65,
+	"dept" : "IT"
+}
+{
+	"_id" : ObjectId("5d91a292675a60950731fe88"),
+	"sid" : 4,
+	"name" : "Vaishnavi",
+	"marks" : 55,
+	"dept" : "MECH"
+}
+> 
