@@ -1,0 +1,109 @@
+root@localhost ~]# systemctl start mysqld
+[root@localhost ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 4
+Server version: 5.5.33a-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2013, Oracle, Monty Program Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> use college
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MariaDB [college]> select * from library;
++--------+----------+---------------+
+| bookid | bookname | Date_Of_issue |
++--------+----------+---------------+
+|    100 | toc      | 2018-02-22    |
+|    101 | maths    | 2018-03-15    |
+|    102 | sen      | 2018-04-13    |
+|    103 | isee     | 2018-05-15    |
+|    104 | dbms     | 2018-06-14    |
+|    105 | ads      | 2018-06-20    |
++--------+----------+---------------+
+6 rows in set (0.00 sec)
+
+MariaDB [college]> show tables;
++-------------------+
+| Tables_in_college |
++-------------------+
+| library           |
+| library_audit     |
+| newrollcall       |
+| oldrollcall       |
++-------------------+
+4 rows in set (0.00 sec)
+
+MariaDB [college]> desc library_audit;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| bookid        | int(10)     | YES  |     | NULL    |       |
+| bookname      | varchar(20) | YES  |     | NULL    |       |
+| Date_of_issue | date        | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+3 rows in set (0.02 sec)
+
+MariaDB [college]> create trigger trig  after update on library  for each row insert into library_audit values(Old.bookid,Old.bookname,Old.Date_of_issue);
+Query OK, 0 rows affected (0.06 sec)
+
+MariaDB [college]> update library set bookname='theory of computation' where bookid=100;
+Query OK, 1 row affected, 1 warning (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 1
+
+MariaDB [college]> select * from library;
++--------+----------------------+---------------+
+| bookid | bookname             | Date_Of_issue |
++--------+----------------------+---------------+
+|    100 | theory of computatio | 2018-02-22    |
+|    101 | maths                | 2018-03-15    |
+|    102 | sen                  | 2018-04-13    |
+|    103 | isee                 | 2018-05-15    |
+|    104 | dbms                 | 2018-06-14    |
+|    105 | ads                  | 2018-06-20    |
++--------+----------------------+---------------+
+6 rows in set (0.00 sec)
+
+MariaDB [college]> select * from library_audit;
++--------+----------+---------------+
+| bookid | bookname | Date_of_issue |
++--------+----------+---------------+
+|    100 | toc      | 2018-02-22    |
+|    100 | toc      | 2018-02-22    |
++--------+----------+---------------+
+2 rows in set (0.00 sec)
+
+MariaDB [college]> create trigger del after delete on library for each row insert into library_audit values(Old.bookid,Old.bookname,Old.Date_of_issue);
+Query OK, 0 rows affected (0.06 sec)
+
+MariaDB [college]> delete * from library where bookid=105;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '* from library where bookid=105' at line 1
+MariaDB [college]> delete from library where bookid=105;
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [college]> select * from library;
++--------+----------------------+---------------+
+| bookid | bookname             | Date_Of_issue |
++--------+----------------------+---------------+
+|    100 | theory of computatio | 2018-02-22    |
+|    101 | maths                | 2018-03-15    |
+|    102 | sen                  | 2018-04-13    |
+|    103 | isee                 | 2018-05-15    |
+|    104 | dbms                 | 2018-06-14    |
++--------+----------------------+---------------+
+5 rows in set (0.00 sec)
+
+MariaDB [college]> select * from libaray_audit;
+ERROR 1146 (42S02): Table 'college.libaray_audit' doesn't exist
+MariaDB [college]> select * from library_audit;
++--------+----------+---------------+
+| bookid | bookname | Date_of_issue |
++--------+----------+---------------+
+|    100 | toc      | 2018-02-22    |
+|    100 | toc      | 2018-02-22    |
+|    105 | ads      | 2018-06-20    |
++--------+----------+---------------+
+3 rows in set (0.00 sec)
