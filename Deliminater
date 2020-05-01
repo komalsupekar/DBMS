@@ -1,0 +1,216 @@
+
+Assignment No:7
+
+[root@localhost ~]# systemctl start mysqld.service
+[root@localhost ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 2
+Server version: 5.5.33a-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2013, Oracle, Monty Program Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database             |
++--------------------+
+| information_schema |
+| library                 |
+| mysql                  |
+| performance_schema |
+| stud                     |
+| student                |
+| test                      |
++--------------------+
+7 rows in set (0.05 sec)
+
+MariaDB [(none)]> create database dbms7;
+Query OK, 1 row affected (0.01 sec)
+
+MariaDB [(none)]> use dbms7
+Database changed
+MariaDB [dbms7]> create table Stud_Marks(name char(20),total_marks int(4));
+Query OK, 0 rows affected (0.07 sec)
+
+MariaDB [dbms7]> create table Result(Roll int(2) primary key,Name char(20),Class char(25))
+    -> ;
+Query OK, 0 rows affected (0.05 sec)
+
+MariaDB [dbms7]> desc Stud_Marks;
++-------------+----------+------+-----+---------+-------+
+| Field       | Type     | Null | Key | Default | Extra    |
++-------------+----------+------+-----+---------+-------+
+| name        | char(20) | YES  |     | NULL    |            |
+| total_marks | int(4)   | YES  |     | NULL    |           |
++-------------+----------+------+-----+---------+-------+
+2 rows in set (0.02 sec)
+
+MariaDB [dbms7]> desc Result;
++-------+----------+------+-----+---------+-------+
+| Field | Type     | Null | Key | Default | Extra   |
++-------+----------+------+-----+---------+-------+
+| Roll  | int(2)   | NO   | PRI | NULL    |           |
+| Name  | char(20) | YES  |     | NULL    |        |
+| Class | char(25) | YES  |     | NULL    |          |
++-------+----------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+MariaDB [dbms7]> insert into Result(Roll,Name) values(1,'AA');
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]> insert into Result(Roll,Name) values(2,'BB');
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]> insert into Result(Roll,Name) values(3,'CC')
+    -> ;
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]> insert into Result(Roll,Name) values(4,'DD');
+Query OK, 1 row affected (0.01 sec)
+
+MariaDB [dbms7]>  insert into Result(Roll,Name) values(5,'EE');
+Query OK, 1 row affected (0.01 sec)
+
+MariaDB [dbms7]>  insert into Stud_Marks values('AA',994);
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]>  insert into Stud_Marks values('BB',865);
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]>  insert into Stud_Marks values('CC',932);
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]>  insert into Stud_Marks values('DD',1034);
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]>  insert into Stud_Marks values('EE',650);
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [dbms7]> select * from Stud_Marks;
++------+-------------+
+| name | total_marks |
++------+-------------+
+| AA   |         994     |
+| BB   |         865     |
+| CC   |         932     |
+| DD   |        1034    |
+| EE   |         650      |
++------+-------------+
+5 rows in set (0.00 sec)
+
+MariaDB [dbms7]>  select * from Result;
++------+------+-------+
+| Roll | Name | Class |
++------+------+-------+
+|    1 | AA   | NULL  |
+|    2 | BB   | NULL  |
+|    3 | CC   | NULL  |
+|    4 | DD   | NULL  |
+|    5 | EE   | NULL  |
++------+------+-------+
+5 rows in set (0.00 sec)
+
+
+MariaDB [dbms7]>  delimiter $$
+MariaDB [dbms7]>  create procedure proc_Grade(in r int(2),out grade char(25))
+    -> begin
+    -> declare m int(4);
+    -> select total_marks into m from Stud_Marks where name=(select Name from Result where Roll=r);
+    ->  if m>=990 and m<=1500 then
+    ->  select 'Distinction' into grade;
+    -> update Result set Class='Distinction' where Roll=r;
+    -> elseif m>=900 and m<=989 then
+    -> select 'FirstClass' into grade;
+    -> update Result set Class='FirstClass' where Roll=r;
+    -> elseif m>=825 and m<=899 then
+    -> select 'SecondClass' into grade;
+    -> update Result set Class='SecondClass' where Roll=r;
+    -> else
+    -> select '--' into grade;
+    -> update Result set Class='--' where Roll=r;
+    -> end if;
+    ->  end $$
+Query OK, 0 rows affected (0.04 sec)
+
+MariaDB [dbms7]> delimiter //
+MariaDB [dbms7]> create function func_Grade(r int(2))
+    -> returns char(25)
+    -> deterministic
+    -> begin
+    -> declare grade char(25);
+    -> call proc_Grade(r,grade);
+    -> return grade;
+    -> end //
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [dbms7]> select func_Grade(1);
+    -> //
++---------------+
+| func_Grade(1) |
++---------------+
+| Distinction   |
++---------------+
+1 row in set (0.01 sec)
+
+MariaDB [dbms7]>  select func_Grade(2);
+    -> //
++---------------+
+| func_Grade(2) |
++---------------+
+| SecondClass   |
++---------------+
+1 row in set (0.02 sec)
+
+MariaDB [dbms7]> select func_Grade(3);
+    -> //
++---------------+
+| func_Grade(3) |
++---------------+
+| FirstClass    |
++---------------+
+1 row in set (0.02 sec)
+
+MariaDB [dbms7]> select func_Grade(4);
+    -> //
++---------------+
+| func_Grade(4) |
++---------------+
+| Distinction   |
++---------------+
+1 row in set (0.02 sec)
+
+MariaDB [dbms7]>  select func_Grade(5);
+    -> //
++---------------+
+| func_Grade(5) |
++---------------+
+| --            |
++---------------+
+1 row in set (0.03 sec)
+
+MariaDB [dbms7]> select * from Result;
+    -> //
++------+------+-------------+
+| Roll | Name | Class       |
++------+------+-------------+
+|    1 | AA   | Distinction |
+|    2 | BB   | SecondClass |
+|    3 | CC   | FirstClass  |
+|    4 | DD   | Distinction |
+|    5 | EE   | --          |
++------+------+-------------+
+5 rows in set (0.00 sec)
+
+MariaDB [dbms7]> select * from Stud_Marks;
+    -> //
++------+-------------+
+| name | total_marks |
++------+-------------+
+| AA   |         994 |
+| BB   |         865 |
+| CC   |         932 |
+| DD   |        1034 |
+| EE   |         650 |
++------+-------------+
+5 rows in set (0.00 sec)
