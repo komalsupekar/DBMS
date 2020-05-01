@@ -1,0 +1,25 @@
+import java.sql.*;
+public class Conctn
+{
+	
+	public static void main(String args[]) throws SQLException, ClassNotFoundException
+	{
+		Connection con;
+		Statement st;
+		ResultSet rs;
+		String pass="redhat",qry="select *from emp";
+		Class.forName("com.mysql.jdbc.Driver");
+		con=DriverManager.getConnection("jdbc:mysql://localhost/wipro?"+"user=root");
+		System.out.println("\n Connection Successful !\n ");
+		st=con.createStatement();
+		rs=st.executeQuery(qry);
+		System.out.println("ID" +"\t" +"Name" +"\t" +"Salary");
+		System.out.println("===========================");
+		while(rs.next())
+		{
+			System.out.println(rs.getInt("id") +"\t" +rs.getString("name") +"\t" +rs.getInt("salary"));
+		}
+		con.close();
+	}
+}
+
