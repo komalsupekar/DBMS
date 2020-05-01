@@ -1,0 +1,72 @@
+[root@localhost ~]# systemctl start mongod
+[root@localhost ~]# mongo
+MongoDB shell version: 2.4.6
+connecting to: test
+> show dbs
+agg	0.203125GB
+local	0.078125GB
+> use dept
+switched to db dept
+> db.dept.insert({roll:1,name:'karan'})
+> db.dept.insert({roll:2,name:'raj'})
+> db.dept.insert({roll:3,name:'rajat'})
+> db.dept.insert({roll:4,name:'arjun'})
+> db.dept.insert({roll:5,name:'sham'})
+> db.dept.insert({roll:6,name:'ram'})
+> db.dept.find()
+{ "_id" : ObjectId("50e1ee1a55fdcf5e03764746"), "roll" : 1, "name" : "karan" }
+{ "_id" : ObjectId("50e1ee2e55fdcf5e03764747"), "roll" : 2, "name" : "raj" }
+{ "_id" : ObjectId("50e1ee3a55fdcf5e03764748"), "roll" : 3, "name" : "rajat" }
+{ "_id" : ObjectId("50e1ee4755fdcf5e03764749"), "roll" : 4, "name" : "arjun" }
+{ "_id" : ObjectId("50e1ee5055fdcf5e0376474a"), "roll" : 5, "name" : "sham" }
+{ "_id" : ObjectId("50e1ee5b55fdcf5e0376474b"), "roll" : 6, "name" : "ram" }
+> db.dept.find({name:'karan'}).explain()
+{
+	"cursor" : "BasicCursor",
+	"isMultiKey" : false,
+	"n" : 1,
+	"nscannedObjects" : 6,
+	"nscanned" : 6,
+	"nscannedObjectsAllPlans" : 6,
+	"nscannedAllPlans" : 6,
+	"scanAndOrder" : false,
+	"indexOnly" : false,
+	"nYields" : 0,
+	"nChunkSkips" : 0,
+	"millis" : 0,
+	"indexBounds" : {
+		
+	},
+	"server" : "localhost.localdomain:27017"
+}
+> db.dept.ensureIndex({name:1})
+> db.dept.find({name:'karan'}).explain()
+{
+	"cursor" : "BtreeCursor name_1",
+	"isMultiKey" : false,
+	"n" : 1,
+	"nscannedObjects" : 1,
+	"nscanned" : 1,
+	"nscannedObjectsAllPlans" : 1,
+	"nscannedAllPlans" : 1,
+	"scanAndOrder" : false,
+	"indexOnly" : false,
+	"nYields" : 0,
+	"nChunkSkips" : 0,
+	"millis" : 0,
+	"indexBounds" : {
+		"name" : [
+			[
+				"karan",
+				"karan"
+			]
+		]
+	},
+	"server" : "localhost.localdomain:27017"
+}
+> db.dept.dropIndexes()
+{
+	"nIndexesWas" : 2,
+	"msg" : "non-_id indexes dropped for collection",
+	"ok" : 1
+}
